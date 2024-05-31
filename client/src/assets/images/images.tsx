@@ -1,0 +1,17 @@
+export { default as carousel1 } from "./carousel-1.jpg";
+export { default as carousel2 } from "./carousel-1.jpg";
+export { default as about1 } from "./about-1.jpg";
+export { default as about2 } from "./about-2.jpg";
+export { default as about3 } from "./about-3.jpg";
+export { default as feature } from "./feature.jpg";
+export { default as price1 } from "./price-1.jpg";
+export { default as price2 } from "./price-2.jpg";
+export { default as price3 } from "./price-3.jpg";
+export { default as team1 } from "./team-1.jpg";
+export { default as team2 } from "./team-2.jpg";
+export { default as team3 } from "./team-3.jpg";
+export { default as team4 } from "./team-4.jpg";
+export { default as testimonial1 } from "./testimonial-1.jpg";
+export { default as testimonial2 } from "./testimonial-2.jpg";
+export { default as testimonial3 } from "./testimonial-3.jpg";
+export { default as testimonial4 } from "./testimonial-4.jpg";

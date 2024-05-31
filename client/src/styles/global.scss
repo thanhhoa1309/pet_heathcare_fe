@@ -1,0 +1,11 @@
+// @import "./base/_variable";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
