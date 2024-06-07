@@ -7,18 +7,22 @@ export const useRefreshToken = () => {
   let isRefreshing = false;
 
   const refreshToken = async () => {
-    const sessionUse = await getSession();
-    const refreshPromise = http
-      .post("/auth/refresh-token", {
-        refreshToken: sessionUse?.user.refresh,
-      })
-      .then((res) => {
-        if (sessionUse) sessionUse.user.access = res.data.tokens.refresh;
-        else signIn();
-      })
-      .finally(() => {});
+    try {
+      const sessionUse = await getSession();
+      const res = await http.post("/api/v1/auth/refresh-token", {
+        token: sessionUse?.user.refresh,
+      });
 
-    return refreshPromise;
+      if (res.data.accessToken && session) {
+        session.user.access = res.data.accessToken;
+        return res.data.accessToken;
+      } else {
+        signIn();
+        return null;
+      }
+    } catch (error: any) {
+      console.error("Failed to refresh token:", error);
+    }
   };
 
   return refreshToken;
