@@ -1,7 +1,7 @@
 "use client";
 import { useRefreshToken } from "@/utils/axiosRefresh";
 import axios from "axios";
-import { getSession, signOut, useSession } from "next-auth/react";
+import { getSession, signIn, signOut, useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -37,18 +37,24 @@ const UseAxiosAuth = () => {
       (response) => response,
       async (error) => {
         const prevRequest = error?.config;
-        if (error.response?.status === 401 || !prevRequest?.sent) {
+        console.log(prevRequest);
+        if (
+          (error.response?.status === 401 || error.response?.status === 403) &&
+          !prevRequest?.sent
+        ) {
           const sessionUse = await getSession();
           prevRequest.sent = true;
-          await refreshToken();
-          prevRequest.headers[
-            "Authorization"
-          ] = `Bearer ${sessionUse?.user.access}`;
-          return axiosAuth(prevRequest);
+          const newAccessToken = await refreshToken();
+          if (newAccessToken) {
+            prevRequest.headers.Authorization = `Bearer ${sessionUse?.user.access}`;
+            return axiosAuth(prevRequest);
+          } else {
+            await signIn();
+          }
         }
 
         if (error.response?.status === 400 || error.response?.status === 404) {
-          // console.log(error.response.message);
+          console.log(error.response.data.error);
 
           // console.log('Status 400 during HTTP request.');
           return Promise.resolve(error.response);
