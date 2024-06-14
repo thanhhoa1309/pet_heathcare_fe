@@ -1,77 +1,54 @@
 "use client";
-import { Button, Dropdown, MenuProps, Modal, Space, Tag } from "antd";
+import { Badge, Button, Dropdown, MenuProps, Modal, Space, Tag } from "antd";
 import { ColumnsType, TableProps } from "antd/es/table";
 // import { AccountModel } from './models';
-import { Image } from "antd";
-// import Image from "next/image";
+
 import {
   EllipsisOutlined,
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import { MdDisabledByDefault } from "react-icons/md";
-import { DoctorModel } from "@/app/admin/doctor/_components/type";
+import { AppointmentModel } from "@/app/(homepage)/user/appointment/_components/type";
 
-const Color = [
-  "#F8BBD9", // Pastel Pink
-  "#E6C9AF", // Pastel Peach
-  "#C6E0CE", // Pastel Mint Green
-  "#A9DCD3", // Pastel Blue
-  "#DCDCDC", // Pastel Gray
-  "#F0F8FF", // Pastel Light Blue
-  "#FFF6B9", // Pastel Cream
-];
-
-export const doctorColumn: ColumnsType<DoctorModel> = [
+export const appointmentsColumn: ColumnsType<AppointmentModel> = [
   {
-    title: "",
-    dataIndex: "Image",
-    render: (_, record) => {
-      console.log(record);
+    title: "Appointment Date",
+    dataIndex: "appointmentDate",
+  },
+  {
+    title: "Pet",
+    dataIndex: "petName",
+  },
+  {
+    title: "Doctor",
+    dataIndex: "doctorName",
+  },
+  {
+    title: "Status",
+    dataIndex: "appointmentStatus",
+    render: (text, record: AppointmentModel) => {
       return (
         <>
-          <Image src={record.imageUrl} alt={"doctor"} width={50} />
+          <Tag color="success">{record.appointmentStatus}</Tag>
         </>
       );
     },
   },
   {
-    title: "Full Name",
-    dataIndex: "fullName",
-  },
-  {
-    title: "Email",
-    dataIndex: "email",
-  },
-  {
-    title: "Working time",
-    dataIndex: "Working time",
-    render: (_, record) => {
+    title: "Deleted",
+    dataIndex: "delete",
+    render: (text, record) => {
       return (
         <>
-          {record.start_time} - {record.end_time}
-        </>
-      );
-    },
-  },
-  {
-    title: "Working day",
-    dataIndex: "Working day",
-    render: (_, record) => {
-      return (
-        <>
-          {record.workingDay.map((day, index) => {
-            return (
-              <>
-                <Tag
-                  color={Color[index]}
-                  style={{ marginRight: 3, marginBottom: 3 }}
-                >
-                  {day}
-                </Tag>
-              </>
-            );
-          })}
+          {record.deleted ? (
+            <>
+              <Tag color="success">TRUE</Tag>
+            </>
+          ) : (
+            <>
+              <Tag color="error">FALSE</Tag>
+            </>
+          )}
         </>
       );
     },
@@ -123,20 +100,32 @@ export const doctorColumn: ColumnsType<DoctorModel> = [
             label: (
               <a
                 onClick={() => {
-                  Modal.confirm({
-                    title: "Do you really want to delete this cage?",
-                    centered: true,
-                    width: "500px",
-                    onOk: () => {
-                      onRemove?.();
-                    },
-                    footer: (_, { OkBtn, CancelBtn }) => (
-                      <>
-                        <CancelBtn />
-                        <OkBtn />
-                      </>
-                    ),
-                  });
+                  {
+                    !record.deleted
+                      ? Modal.confirm({
+                          title: "Do you really want to delete this account?",
+                          centered: true,
+                          width: "500px",
+                          onOk: () => {
+                            onRemove?.();
+                          },
+                          footer: (_, { OkBtn, CancelBtn }) => (
+                            <>
+                              <CancelBtn />
+                              <OkBtn />
+                            </>
+                          ),
+                        })
+                      : Modal.info({
+                          title: "Account deleted",
+                          content: (
+                            <div>
+                              <p>This account is deleted</p>
+                            </div>
+                          ),
+                          onOk() {},
+                        });
+                  }
                 }}
               >
                 <Space>
@@ -145,7 +134,6 @@ export const doctorColumn: ColumnsType<DoctorModel> = [
               </a>
             ),
             key: "2",
-            disabled: true,
           },
         ];
       };
@@ -167,5 +155,3 @@ export const doctorColumn: ColumnsType<DoctorModel> = [
     },
   },
 ];
-
-const getTagColor = (day: string[]) => {};

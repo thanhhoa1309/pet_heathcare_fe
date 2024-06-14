@@ -2,7 +2,7 @@
 export default function Header() {
   return (
     <>
-      <div className="container-fluid bg-dark text-white mt-5 py-5 px-sm-3 px-md-5">
+      <div className="container-fluid bg-dark text-white pb-5 px-sm-3 px-md-5">
         <div className="row pt-5">
           <div className="col-lg-4 col-md-12 mb-5">
             <h1 className="mb-3 display-5 text-capitalize text-white">

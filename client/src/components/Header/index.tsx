@@ -1,10 +1,82 @@
 "use client";
 
+import { UserOutlined } from "@ant-design/icons";
+import { Avatar, ConfigProvider, Dropdown, MenuProps } from "antd";
+import { getSession, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { BsHospital } from "react-icons/bs";
+import { CgProfile } from "react-icons/cg";
+import { MdOutlinePets } from "react-icons/md";
+import { VscSignOut } from "react-icons/vsc";
 
 export default function Header() {
   const router = useRouter();
+  const path = usePathname();
+  const { data: session } = useSession();
+
+  const [role, setRole] = useState<any>();
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const sessionUse = await getSession();
+      setRole(sessionUse?.user);
+      // console.log(sessionUse?.user);
+    };
+
+    fetchSession();
+    console.log(path);
+  }, []);
+
+  const items: MenuProps["items"] = [
+    {
+      key: "1",
+      label: (
+        <div
+          style={{ padding: "10px 20px" }}
+          onClick={() => router.push("/user/profile")}
+        >
+          Profile
+        </div>
+      ),
+      icon: <CgProfile style={{ fontSize: "24px" }} />,
+    },
+    {
+      key: "2",
+      label: (
+        <div
+          style={{ padding: "10px 20px" }}
+          onClick={() => router.push("/user/pets")}
+        >
+          Pets
+        </div>
+      ),
+      icon: <MdOutlinePets style={{ fontSize: "24px" }} />,
+    },
+    {
+      key: "3",
+      label: (
+        <div
+          style={{ padding: "10px 20px" }}
+          onClick={() => router.push("/user/appointment")}
+        >
+          Appointment
+        </div>
+      ),
+      icon: <BsHospital style={{ fontSize: "24px" }} />,
+    },
+    {
+      key: "4",
+      label: (
+        <div style={{ padding: "10px 20px" }} onClick={() => signOut()}>
+          <span>Sign out</span>
+        </div>
+      ),
+      icon: <VscSignOut style={{ fontSize: "24px" }} />,
+    },
+  ];
+
   return (
     <>
       <div className="container-fluid">
@@ -55,48 +127,80 @@ export default function Header() {
             id="navbarCollapse"
           >
             <div className="navbar-nav mr-auto py-0">
-              <a href="index.html" className="nav-item nav-link active">
+              <Link
+                href="/"
+                className={`nav-item nav-link ${path === "/" ? "active" : ""}`}
+              >
                 Home
-              </a>
-              <a href="about.html" className="nav-item nav-link">
+              </Link>
+              <Link
+                href="about"
+                className={`nav-item nav-link ${
+                  path === "/about" ? "active" : ""
+                }`}
+              >
                 About
-              </a>
-              <a href="service.html" className="nav-item nav-link">
+              </Link>
+              <Link
+                href="service"
+                className={`nav-item nav-link ${
+                  path === "/service" ? "active" : ""
+                }`}
+              >
                 Service
-              </a>
-              <a href="price.html" className="nav-item nav-link">
-                Price
-              </a>
-              <a href="booking.html" className="nav-item nav-link">
+              </Link>
+              <Link
+                href="booking"
+                className={`nav-item nav-link ${
+                  path === "/booking" ? "active" : ""
+                }`}
+              >
                 Booking
-              </a>
-              <div className="nav-item dropdown">
-                <a
-                  href="#"
-                  className="nav-link dropdown-toggle"
-                  data-toggle="dropdown"
-                >
-                  Pages
-                </a>
-                <div className="dropdown-menu rounded-0 m-0">
-                  <a href="blog.html" className="dropdown-item">
-                    Blog Grid
-                  </a>
-                  <a href="single.html" className="dropdown-item">
-                    Blog Detail
-                  </a>
-                </div>
-              </div>
-              <a href="contact.html" className="nav-item nav-link">
+              </Link>
+              <Link
+                href="contact"
+                className={`nav-item nav-link ${
+                  path === "/contact" ? "active" : ""
+                }`}
+              >
                 Contact
-              </a>
+              </Link>
             </div>
-            <Link
-              href="/auth/login"
-              className="btn btn-lg btn-primary px-3 d-none d-lg-block"
-            >
-              Sign in
-            </Link>
+            {role?.role && role?.role === "USER" ? (
+              <>
+                <ConfigProvider
+                  theme={{
+                    components: {
+                      Avatar: {
+                        containerSize: 50,
+                      },
+                    },
+                  }}
+                >
+                  <Dropdown menu={{ items }} placement="bottomRight" arrow>
+                    <Avatar
+                      style={{ backgroundColor: "#87d068" }}
+                      icon={<UserOutlined />}
+                    />
+                  </Dropdown>
+                </ConfigProvider>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  className="btn btn-lg btn-primary px-3 d-none d-lg-block mr-3"
+                >
+                  Sign in
+                </Link>{" "}
+                <Link
+                  href="/auth/register"
+                  className="btn btn-lg btn-primary px-3 d-none d-lg-block"
+                >
+                  Sign up
+                </Link>
+              </>
+            )}
           </div>
         </nav>
       </div>
