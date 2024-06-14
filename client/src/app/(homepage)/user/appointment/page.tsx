@@ -1,10 +1,16 @@
 "use client";
-import { cageColumn } from "@/app/admin/cage/_components/columnTypes";
-import { CageModel } from "@/app/admin/cage/_components/type";
-import CreateCage from "@/app/admin/cage/createCage";
-import UpdateCage from "@/app/admin/cage/updateCage";
-import { doctorColumn } from "@/app/admin/doctor/_components/columnTypes";
-import UpdateDoctor from "@/app/admin/doctor/updateDoctor";
+import { appointmentsColumn } from "@/app/(homepage)/user/appointment/_components/columnTypes";
+import {
+  AppointmentModel,
+  AppointmentResponse,
+} from "@/app/(homepage)/user/appointment/_components/type";
+import CreateAppointment from "@/app/(homepage)/user/appointment/createAppointment";
+import { petColumn } from "@/app/(homepage)/user/pets/_components/columnTypes";
+import { PetModel } from "@/app/(homepage)/user/pets/_components/type";
+import CreatePet from "@/app/(homepage)/user/pets/createPet";
+import UpdatePet from "@/app/(homepage)/user/pets/updatePet";
+import CreateUser from "@/app/admin/account/createUser";
+import UpdateUser from "@/app/admin/account/updateUser";
 import UseAxiosAuth from "@/utils/axiosClient";
 import { LoadingOutlined } from "@ant-design/icons";
 import {
@@ -21,7 +27,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function Doctor() {
+export default function AdminAccount() {
   const instance = UseAxiosAuth();
   const router = useRouter();
 
@@ -36,11 +42,18 @@ export default function Doctor() {
   const [updateState, setUpdateState] = useState<boolean>(false);
   // const [deleteState, setDeleteState] = useState<boolean>(false);
 
-  const [cages, setCages] = useState<CageModel[]>([]);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
+
+  const [appointments, setAppointments] = useState<AppointmentModel[]>([]);
+  const [appointmentsRes, setAppointmentsRes] = useState<AppointmentResponse>();
 
   const openNotification = (type: "success" | "error", status: string) => {
     api[type]({
-      message: `Account ${status}`,
+      message: `Pet ${status}`,
       placement: "bottomRight",
       duration: 1.5,
     });
@@ -75,7 +88,7 @@ export default function Doctor() {
   const handleDelete = async (id: string) => {
     setIsLoading(true);
     try {
-      const res = await instance.patch(`/api/v1/cage/delete/${id}`);
+      const res = await instance.patch(`/api/v1/pet/delete/${id}`);
       if (res.data.status === 200 || res.data.status === 201) {
         openNotification("success", "deleted successfully");
         handleEvent();
@@ -89,51 +102,61 @@ export default function Doctor() {
     setIsLoading(false);
   };
 
-  const fetchDataList = async () => {
+  const handlePagination = async (page: number = pagination.current) => {
     setIsLoading(true);
     try {
-      const res = await instance.get("/api/v1/doctor");
+      const res = await instance.get("/api/v1/appointment", {
+        params: {
+          page: page - 1,
+        },
+      });
 
       let tempRes = res.data.data;
 
-      setCages(tempRes);
+      setAppointmentsRes(tempRes);
+      setAppointments(tempRes.content);
+      setPagination({
+        current: page,
+        pageSize: tempRes.size,
+        total: tempRes.totalElements,
+      });
+      setIsLoading(false);
     } catch (error: any) {
       console.log(error);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
-    fetchDataList();
+    handlePagination();
   }, []);
 
   const handleEvent = () => {
-    fetchDataList();
+    handlePagination();
   };
 
   return (
     <>
-      <div>
+      <div className="container py-5">
         {contextHolder}
         <Row justify={"space-between"} style={{ marginBottom: 16 }}>
           <Col>
             <strong
             // className={cx('title')}
             >
-              DOCTORS
+              Appointment
             </strong>{" "}
             <br />
-            <Breadcrumb
+            {/* <Breadcrumb
               items={[
                 {
                   href: "/admin/dashboard",
                   title: "Home",
                 },
                 {
-                  title: "Doctors",
+                  title: "Accounts",
                 },
               ]}
-            />
+            /> */}
           </Col>
           <Col>
             {hasSelected ? (
@@ -155,7 +178,12 @@ export default function Doctor() {
             ) : (
               <Space>
                 <span style={{ color: "grey", lineHeight: "12px" }}>
-                  Totals {!isLoading ? cages.length : <LoadingOutlined />}{" "}
+                  Totals{" "}
+                  {!isLoading ? (
+                    appointmentsRes?.totalElements
+                  ) : (
+                    <LoadingOutlined />
+                  )}{" "}
                   records
                 </span>
                 <Divider type="vertical" />
@@ -164,10 +192,14 @@ export default function Doctor() {
                   type="primary"
                   onClick={() => setCreateState(true)}
                   // menu={{ items }}
-                  disabled
                 >
-                  Create New Doctor
+                  Create New Appointment
                 </Button>
+                <CreateAppointment
+                  isOpen={createState}
+                  onClose={() => setCreateState(false)}
+                  onReload={handleEvent}
+                />
                 {/* <UpdateAccount
                   params={{
                     id: accountId,
@@ -184,33 +216,46 @@ export default function Doctor() {
           loading={isLoading}
           rowKey="id"
           rowSelection={rowSelection}
-          // onRow={(record) => ({
-          //   onClick: (event) => {
-          //     const target = event.target as HTMLElement;
-          //     const isWithinLink =
-          //       target.tagName === "A" || target.closest("a");
-          //     const isWithinAction =
-          //       target.closest("td")?.classList.contains("ant-table-cell") &&
-          //       !target
-          //         .closest("td")
-          //         ?.classList.contains("ant-table-selection-column") &&
-          //       !target
-          //         .closest("td")
-          //         ?.classList.contains("ant-table-cell-fix-right");
+          onRow={(record) => ({
+            onClick: (event) => {
+              const target = event.target as HTMLElement;
+              const isWithinLink =
+                target.tagName === "A" || target.closest("a");
+              const isWithinAction =
+                target.closest("td")?.classList.contains("ant-table-cell") &&
+                !target
+                  .closest("td")
+                  ?.classList.contains("ant-table-selection-column") &&
+                !target
+                  .closest("td")
+                  ?.classList.contains("ant-table-cell-fix-right");
 
-          //     if (isWithinAction && !isWithinLink) {
-          //       handleUpdate(record.id);
-          //     }
-          //   },
-          // })}
-          columns={doctorColumn}
-          dataSource={cages.map((cage: any) => ({
-            ...cage,
-            onUpdate: () => handleUpdate(cage.id),
-            onRemove: () => handleDelete(cage.id),
+              if (isWithinAction && !isWithinLink) {
+                handleUpdate(record.id);
+              }
+            },
+          })}
+          columns={appointmentsColumn}
+          dataSource={appointments.map((appointment: any) => ({
+            ...appointment,
+            onUpdate: () => handleUpdate(appointment.id),
+            onRemove: () => handleDelete(appointment.id),
           }))}
+          pagination={{
+            ...pagination,
+            onChange: (page, pageSize) => handlePagination(page),
+            onShowSizeChange: (_, size) => handlePagination(),
+            showSizeChanger: true,
+            pageSizeOptions: ["5"],
+            // showTotal: (total, range) =>
+            //   {
+            //     from: range[0],
+            //     to: range[1],
+            //     total: total,
+            //   }),
+          }}
         />
-        <UpdateDoctor
+        <UpdatePet
           isOpen={updateState}
           onClose={() => setUpdateState(false)}
           onReload={handleEvent}

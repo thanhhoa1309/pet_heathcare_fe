@@ -64,6 +64,7 @@ export default function UpdateUser(props: userModal) {
         });
         let tempRes = res.data.data;
         setUser(tempRes);
+        console.log(res);
       }
     } catch (error: any) {
       console.log(error);
@@ -151,6 +152,7 @@ export default function UpdateUser(props: userModal) {
                   { value: "STAFF", label: "Staff" },
                   { value: "ADMIN", label: "Admin" },
                 ]}
+                disabled
               ></Select>
             </Form.Item>
 
@@ -165,25 +167,6 @@ export default function UpdateUser(props: userModal) {
               ]}
             >
               <Input placeholder="Enter fullName" />
-            </Form.Item>
-
-            <Form.Item
-              label="Password"
-              name="password"
-              rules={[
-                {
-                  required: true,
-                  message: "Enter password",
-                },
-              ]}
-            >
-              <Input.Password
-                placeholder="Enter password"
-                iconRender={(visible) =>
-                  visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-                }
-                disabled
-              />
             </Form.Item>
 
             <Form.Item
@@ -221,7 +204,7 @@ export default function UpdateUser(props: userModal) {
                   spinning={false}
                 >
                   <Button type="primary" htmlType="submit">
-                    Create
+                    Save
                   </Button>
                 </Spin>
               </Space>

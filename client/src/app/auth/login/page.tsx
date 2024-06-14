@@ -84,7 +84,7 @@ export default function LoginPage() {
         if (!flag) setError("UNDEFINE");
       } else {
         setIsLoading(false);
-        setError("Invalid email or password");
+        setError(saveReq.error);
       }
     }
   }, [saveReq]);

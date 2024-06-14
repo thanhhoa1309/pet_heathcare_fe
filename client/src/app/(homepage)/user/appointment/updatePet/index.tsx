@@ -1,5 +1,5 @@
 "use client";
-import { CageModel } from "@/app/admin/cage/_components/type";
+import { PetModel } from "@/app/(homepage)/user/pets/_components/type";
 import UseAxiosAuth from "@/utils/axiosClient";
 import {
   EyeInvisibleOutlined,
@@ -8,9 +8,9 @@ import {
 } from "@ant-design/icons";
 import {
   Button,
+  DatePicker,
   Form,
   Input,
-  InputNumber,
   Modal,
   NotificationArgsProps,
   Row,
@@ -21,17 +21,22 @@ import {
 } from "antd";
 import { useForm } from "antd/es/form/Form";
 import { NotificationPlacement } from "antd/es/notification/interface";
+import dayjs from "dayjs";
 import React, { useEffect } from "react";
 import { useMemo, useState } from "react";
 
-interface userModal {
+interface petModal {
   isOpen: boolean;
   onClose: () => void;
   onReload: () => void;
+  id: string;
 }
 
-export default function CreateCage(props: userModal) {
-  const { isOpen, onClose, onReload } = props;
+export default function UpdatePet(props: petModal) {
+  const instance = UseAxiosAuth();
+  const { isOpen, onClose, onReload, id } = props;
+
+  const [pet, setPet] = useState<PetModel>();
 
   const [error, setError] = useState<string>("");
 
@@ -42,27 +47,50 @@ export default function CreateCage(props: userModal) {
 
   const openNotification = (type: "success" | "error", description: string) => {
     api[type]({
-      message: `Add new Cage`,
-      description: `Add new Cage ${description}`,
+      message: `Update Pet`,
+      description: `Update Pet ${description}`,
       placement: "bottomRight",
       duration: 1.5,
     });
   };
 
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const res = await instance.get(`/api/v1/pet/${id}`);
+      if (res.data.status === 200 || res.data.status === 201) {
+        form.setFieldsValue({
+          ...res.data.data,
+          birthDate: dayjs(res.data.data?.birthDate),
+        });
+        let tempRes = res.data.data;
+        setPet(tempRes);
+        console.log(res);
+      }
+    } catch (error: any) {
+      console.log(error);
+    }
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    if (isOpen) form.resetFields();
+    if (isOpen) {
+      setError("");
+      form.resetFields();
+      fetchData();
+    }
   }, [isOpen]);
 
   const onFinish = async (values: any) => {
     setError("");
-    let cage: CageModel = {
+    let pet: PetModel = {
       ...values,
     };
 
-    // console.log(user);
+    console.log(pet);
 
     try {
-      const res = await useInstance.post("/api/v1/cage/create", cage);
+      const res = await useInstance.put(`/api/v1/pet/update/${id}`, pet);
 
       if (res.data.status === 200 || res.data.status === 201) {
         openNotification("success", "successfully");
@@ -90,7 +118,7 @@ export default function CreateCage(props: userModal) {
     <>
       {contextHolder}
       <Modal
-        title={<h3 style={{ textAlign: "center" }}>Add new Cage</h3>}
+        title={<h3 style={{ textAlign: "center" }}>Update Pet</h3>}
         open={isOpen}
         width={600}
         onCancel={onClose}
@@ -107,65 +135,66 @@ export default function CreateCage(props: userModal) {
           style={{ margin: "16px" }}
         >
           <Form.Item
-            label="Cage Number"
-            name="cageNumber"
+            label="Pet Name"
+            name="name"
             rules={[
               {
                 required: true,
-                message: "Enter cage number",
-              },
-              {
-                type: "number",
-                min: 0,
-                message: "Enter valid cage number",
+                message: "Enter Pet Name",
               },
             ]}
           >
-            <InputNumber
-              placeholder="Enter cage number"
-              style={{ width: "100%" }}
-            />
+            <Input placeholder="Enter Pet Name" />
           </Form.Item>
 
           <Form.Item
-            label="Status"
-            name="cageStatus"
+            label="Species"
+            name="species"
             rules={[
               {
                 required: true,
-                message: "Select status",
+                message: "Enter Species",
+              },
+            ]}
+          >
+            <Input placeholder="Enter Species" />
+          </Form.Item>
+
+          <Form.Item
+            label="Gender"
+            name="gender"
+            rules={[
+              {
+                required: true,
+                message: "Select Gender",
               },
             ]}
           >
             <Select
-              placeholder="Select status"
+              placeholder="Select Gender"
               options={[
-                { value: "Available", label: "Available" },
-                { value: "Not Available", label: "Not Available" },
+                { value: "MALE", label: "Male" },
+                { value: "FEMALE", label: "Female" },
               ]}
-              disabled
             ></Select>
           </Form.Item>
 
           <Form.Item
-            label="Cage Capacity"
-            name="capacity"
+            label="Birth date"
+            name="birthDate"
             rules={[
               {
                 required: true,
-                message: "Enter cage capacity",
-              },
-              {
-                type: "number",
-                min: 0,
-                max: 5,
-                message: "Enter valid cage capacity",
+                message: "Enter Birth date",
               },
             ]}
           >
-            <InputNumber
-              placeholder="Enter cage capacity"
+            <DatePicker
+              placeholder="Enter Birth date"
               style={{ width: "100%" }}
+              format="YYYY-MM-DD HH:mm:ss"
+              showTime={{ defaultValue: dayjs("00:00:00", "HH:mm:ss") }}
+              disabled
             />
           </Form.Item>
 
@@ -179,7 +208,7 @@ export default function CreateCage(props: userModal) {
                 spinning={false}
               >
                 <Button type="primary" htmlType="submit">
-                  Create
+                  Save
                 </Button>
               </Spin>
             </Space>

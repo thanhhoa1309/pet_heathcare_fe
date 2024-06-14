@@ -122,7 +122,6 @@ export default function AdminLayout({
                 // defaultHoverBg: "#ed6436",
                 primaryShadow: "#ed6436",
                 defaultHoverBg: "#ed6436",
-                defaultHoverColor: "#ed6436",
                 defaultActiveColor: "#ed6436",
                 // defaultHoverBorderColor: "#ed6436",
               },

@@ -140,6 +140,11 @@ export default function UpdateCage(props: userModal) {
                   required: true,
                   message: "Enter cage number",
                 },
+                {
+                  type: "number",
+                  min: 0,
+                  message: "Enter valid cage number",
+                },
               ]}
             >
               <InputNumber
@@ -175,6 +180,12 @@ export default function UpdateCage(props: userModal) {
                 {
                   required: true,
                   message: "Enter cage capacity",
+                },
+                {
+                  type: "number",
+                  min: 0,
+                  max: 5,
+                  message: "Enter valid cage capacity",
                 },
               ]}
             >
