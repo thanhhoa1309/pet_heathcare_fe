@@ -6,11 +6,13 @@ import {
   EyeInvisibleOutlined,
   EyeTwoTone,
   LoadingOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import {
   Button,
   Col,
   Form,
+  GetProp,
   Input,
   InputNumber,
   Modal,
@@ -21,7 +23,10 @@ import {
   Spin,
   Tag,
   TimePicker,
+  UploadProps,
   notification,
+  Image,
+  Upload,
 } from "antd";
 import { useForm } from "antd/es/form/Form";
 import { NotificationPlacement } from "antd/es/notification/interface";
@@ -34,6 +39,7 @@ interface userModal {
   onClose: () => void;
   onReload: () => void;
   id: string;
+  image: string;
 }
 
 interface doctorUpdate {
@@ -71,11 +77,12 @@ function tagRender(props: any) {
 
 export default function UpdateDoctor(props: userModal) {
   const instance = UseAxiosAuth();
-  const { isOpen, onClose, onReload, id } = props;
+  const { isOpen, onClose, onReload, id, image } = props;
 
-  const [cage, setCage] = useState<CageModel>();
+  const [fileList, setFileList] = useState<any[]>([]);
 
   const [error, setError] = useState<string>("");
+  const [errorImage, setErrorImage] = useState<string>("");
 
   const useInstance = UseAxiosAuth();
   const [form] = useForm();
@@ -102,7 +109,6 @@ export default function UpdateDoctor(props: userModal) {
           end_time: dayjs(res.data.data.end_time, "HH:mm:ss"),
         });
         let tempRes = res.data.data;
-        setCage(tempRes);
       }
     } catch (error: any) {
       console.log(error);
@@ -113,6 +119,7 @@ export default function UpdateDoctor(props: userModal) {
   useEffect(() => {
     if (isOpen) {
       setError("");
+      setErrorImage("");
       form.resetFields();
       fetchData();
     }
@@ -156,6 +163,48 @@ export default function UpdateDoctor(props: userModal) {
     }
   };
 
+  const handleChange = ({ fileList }: any) => setFileList(fileList);
+
+  const handleSave = async () => {
+    setErrorImage("");
+    setIsLoading(true);
+    if (fileList.length === 0) {
+      setErrorImage("Please select a image");
+      setIsLoading(false);
+      return;
+    }
+
+    console.log();
+
+    const file = fileList[0].originFileObj;
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      const base64 = reader.result;
+
+      try {
+        const response = await useInstance.post(
+          `/api/v1/doctor/image/${id}`,
+          { file: file },
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        openNotification("success", "successfully");
+        onReload();
+        onClose();
+        setFileList([]);
+      } catch (error: any) {
+        openNotification("error", `failure (${error})`);
+        setError(error);
+        console.log(error);
+      }
+    };
+    setIsLoading(false);
+  };
+
   return (
     <>
       {contextHolder}
@@ -170,10 +219,34 @@ export default function UpdateDoctor(props: userModal) {
       >
         <Spin spinning={isLoading}>
           <Row>
-            <Col style={{ width: "30%" }}></Col>
+            <Col style={{ width: "30%" }}>
+              <div>
+                <Form className="d-flex justify-content-center flex-column">
+                  <Image src={image} alt="Doctor Image" />
+                  <Form.Item>
+                    <Upload
+                      listType="picture"
+                      fileList={fileList}
+                      onChange={handleChange}
+                      beforeUpload={() => false}
+                      maxCount={1}
+                    >
+                      <Button className="mt-3" icon={<UploadOutlined />}>
+                        Select image
+                      </Button>
+                    </Upload>
+                  </Form.Item>
+                  {errorImage && <p style={{ color: "red" }}>{errorImage}</p>}
+                  <Button type="primary" onClick={handleSave}>
+                    Save
+                  </Button>
+                </Form>
+              </div>
+            </Col>
             <Col style={{ width: "70%" }}>
               <Form
                 // {...layout}
+                className={"container"}
                 form={form}
                 name="control-hooks"
                 layout={"vertical"}

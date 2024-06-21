@@ -7,6 +7,11 @@ const nextConfig = {
         destination: "/admin/dashboard",
         permanent: true,
       },
+      {
+        source: "/user",
+        destination: "/",
+        permanent: true,
+      },
     ];
   },
   images: {
