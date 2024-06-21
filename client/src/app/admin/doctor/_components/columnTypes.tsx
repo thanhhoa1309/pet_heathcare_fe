@@ -116,37 +116,37 @@ export const doctorColumn: ColumnsType<DoctorModel> = [
           //   ),
           //   key: '1'
           // },
-          {
-            type: "divider",
-          },
-          {
-            label: (
-              <a
-                onClick={() => {
-                  Modal.confirm({
-                    title: "Do you really want to delete this cage?",
-                    centered: true,
-                    width: "500px",
-                    onOk: () => {
-                      onRemove?.();
-                    },
-                    footer: (_, { OkBtn, CancelBtn }) => (
-                      <>
-                        <CancelBtn />
-                        <OkBtn />
-                      </>
-                    ),
-                  });
-                }}
-              >
-                <Space>
-                  <DeleteOutlined /> Delete
-                </Space>
-              </a>
-            ),
-            key: "2",
-            disabled: true,
-          },
+          // {
+          //   type: "divider",
+          // },
+          // {
+          //   label: (
+          //     <a
+          //       onClick={() => {
+          //         Modal.confirm({
+          //           title: "Do you really want to delete this cage?",
+          //           centered: true,
+          //           width: "500px",
+          //           onOk: () => {
+          //             onRemove?.();
+          //           },
+          //           footer: (_, { OkBtn, CancelBtn }) => (
+          //             <>
+          //               <CancelBtn />
+          //               <OkBtn />
+          //             </>
+          //           ),
+          //         });
+          //       }}
+          //     >
+          //       <Space>
+          //         <DeleteOutlined /> Delete
+          //       </Space>
+          //     </a>
+          //   ),
+          //   key: "2",
+          //   disabled: true,
+          // },
         ];
       };
       return (

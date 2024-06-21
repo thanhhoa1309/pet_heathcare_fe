@@ -1,0 +1,28 @@
+.backContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 3% 0 0 3%;
+}
+
+.buttonCustom {
+  background-color: black;
+  opacity: 0.8;
+}
+
+.buttonCustom:hover {
+  background-color: black !important;
+  opacity: 1;
+}
+
+.colorText {
+  color: rgb(0, 0, 0);
+}
+
+.colorText:hover {
+  color: rgb(0, 0, 0);
+}
+
+.colorError {
+  color: rgb(0, 0, 0);
+}

@@ -3,7 +3,7 @@ export const LOGIN_PATH = "/auth/login",
 
 export const ADMIN_PATH = "/admin";
 
-export const USER_PATH = "/user";
+export const USER_PATH = "/";
 
 export const DOCTOR_PATH = "/doctor";
 
