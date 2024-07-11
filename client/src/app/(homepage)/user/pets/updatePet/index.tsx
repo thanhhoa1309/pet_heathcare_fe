@@ -5,9 +5,11 @@ import {
   EyeInvisibleOutlined,
   EyeTwoTone,
   LoadingOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import {
   Button,
+  Col,
   DatePicker,
   Form,
   Input,
@@ -17,7 +19,9 @@ import {
   Select,
   Space,
   Spin,
+  Upload,
   notification,
+  Image,
 } from "antd";
 import { useForm } from "antd/es/form/Form";
 import { NotificationPlacement } from "antd/es/notification/interface";
@@ -37,8 +41,10 @@ export default function UpdatePet(props: petModal) {
   const { isOpen, onClose, onReload, id } = props;
 
   const [pet, setPet] = useState<PetModel>();
+  const [fileList, setFileList] = useState<any[]>([]);
 
   const [error, setError] = useState<string>("");
+  const [errorImage, setErrorImage] = useState<string>("");
 
   const useInstance = UseAxiosAuth();
   const [form] = useForm();
@@ -78,40 +84,74 @@ export default function UpdatePet(props: petModal) {
       setError("");
       form.resetFields();
       fetchData();
+      setIsLoading(false);
+      setFileList([]);
     }
   }, [isOpen]);
 
   const onFinish = async (values: any) => {
+    setIsLoading(true);
     setError("");
     let pet: PetModel = {
       ...values,
     };
-
-    console.log(pet);
 
     try {
       const res = await useInstance.put(`/api/v1/pet/update/${id}`, pet);
 
       if (res.data.status === 200 || res.data.status === 201) {
         openNotification("success", "successfully");
-        onReload();
-        onClose();
+        handleSave();
       } else {
-        setError(
-          Object.entries(res.data.error)
-            .map(([key, value]) => `${key}: ${value}`)
-            .join("\n")
-        );
-        openNotification(
-          "error",
-          `failure (${Object.values(res.data.error).join(", ")})`
-        );
+        setError(res.data.error);
+        openNotification("error", `failure (${res.data.error})`);
       }
     } catch (error: any) {
+      setIsLoading(false);
       openNotification("error", `failure (${error})`);
       setError(error);
       console.log(error);
     }
+  };
+
+  const handleChange = ({ fileList }: any) => setFileList(fileList);
+
+  const handleSave = async () => {
+    setErrorImage("");
+    setIsLoading(true);
+    if (fileList.length === 0) {
+      setIsLoading(false);
+      onReload();
+      onClose();
+      return;
+    }
+
+    const file = fileList[0].originFileObj;
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      const base64 = reader.result;
+
+      try {
+        const response = await useInstance.post(
+          `/api/v1/pet/image/${id}`,
+          { file: file },
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        openNotification("success", "successfully");
+        onReload();
+        onClose();
+      } catch (error: any) {
+        setIsLoading(false);
+        openNotification("error", `failure (${error})`);
+        setError(error);
+        console.log(error);
+      }
+    };
   };
 
   return (
@@ -120,100 +160,130 @@ export default function UpdatePet(props: petModal) {
       <Modal
         title={<h3 style={{ textAlign: "center" }}>Update Pet</h3>}
         open={isOpen}
-        width={600}
+        width={900}
         onCancel={onClose}
         footer={() => <></>}
         cancelText="No"
         closable={false}
       >
-        <Form
-          // {...layout}
-          form={form}
-          name="control-hooks"
-          layout={"vertical"}
-          onFinish={onFinish}
-          style={{ margin: "16px" }}
-        >
-          <Form.Item
-            label="Pet Name"
-            name="name"
-            rules={[
-              {
-                required: true,
-                message: "Enter Pet Name",
-              },
-            ]}
-          >
-            <Input placeholder="Enter Pet Name" />
-          </Form.Item>
+        <Row className={"my-3"}>
+          <Col style={{ width: "30%" }}>
+            <Form className="d-flex justify-content-center flex-column align-items-center">
+              <Image
+                src={pet?.imageUrl ?? ""}
+                alt="Pet Image"
+                width={200}
+                height={200}
+              />
+              <Form.Item>
+                <Upload
+                  listType="picture"
+                  fileList={fileList}
+                  onChange={handleChange}
+                  beforeUpload={() => false}
+                  maxCount={1}
+                >
+                  <Button className="mt-3" icon={<UploadOutlined />}>
+                    Select image
+                  </Button>
+                </Upload>
+              </Form.Item>
+            </Form>
+          </Col>
 
-          <Form.Item
-            label="Species"
-            name="species"
-            rules={[
-              {
-                required: true,
-                message: "Enter Species",
-              },
-            ]}
-          >
-            <Input placeholder="Enter Species" />
-          </Form.Item>
-
-          <Form.Item
-            label="Gender"
-            name="gender"
-            rules={[
-              {
-                required: true,
-                message: "Select Gender",
-              },
-            ]}
-          >
-            <Select
-              placeholder="Select Gender"
-              options={[
-                { value: "MALE", label: "Male" },
-                { value: "FEMALE", label: "Female" },
-              ]}
-            ></Select>
-          </Form.Item>
-
-          <Form.Item
-            label="Birth date"
-            name="birthDate"
-            rules={[
-              {
-                required: true,
-                message: "Enter Birth date",
-              },
-            ]}
-          >
-            <DatePicker
-              placeholder="Enter Birth date"
-              style={{ width: "100%" }}
-              format="YYYY-MM-DD HH:mm:ss"
-              showTime={{ defaultValue: dayjs("00:00:00", "HH:mm:ss") }}
-              disabled
-            />
-          </Form.Item>
-
-          {error && <p style={{ color: "red" }}>{error}</p>}
-
-          <Row justify="center">
-            <Space size={"large"}>
-              <Button onClick={onClose}>Cancel</Button>
-              <Spin
-                indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
-                spinning={false}
+          <Col style={{ width: "70%" }}>
+            <Form
+              // {...layout}
+              form={form}
+              name="control-hooks"
+              layout={"vertical"}
+              onFinish={onFinish}
+              className={"mx-5"}
+            >
+              <Form.Item
+                label="Pet Name"
+                name="name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Enter Pet Name",
+                  },
+                ]}
               >
-                <Button type="primary" htmlType="submit">
-                  Save
-                </Button>
-              </Spin>
-            </Space>
-          </Row>
-        </Form>
+                <Input placeholder="Enter Pet Name" />
+              </Form.Item>
+
+              <Form.Item
+                label="Species"
+                name="species"
+                rules={[
+                  {
+                    required: true,
+                    message: "Enter Species",
+                  },
+                ]}
+              >
+                <Input placeholder="Enter Species" />
+              </Form.Item>
+
+              <Form.Item
+                label="Gender"
+                name="gender"
+                rules={[
+                  {
+                    required: true,
+                    message: "Select Gender",
+                  },
+                ]}
+              >
+                <Select
+                  placeholder="Select Gender"
+                  options={[
+                    { value: "MALE", label: "Male" },
+                    { value: "FEMALE", label: "Female" },
+                  ]}
+                ></Select>
+              </Form.Item>
+
+              <Form.Item
+                label="Birth date"
+                name="birthDate"
+                rules={[
+                  {
+                    required: true,
+                    message: "Enter Birth date",
+                  },
+                ]}
+              >
+                <DatePicker
+                  placeholder="Enter Birth date"
+                  style={{ width: "100%" }}
+                  format="YYYY-MM-DD HH:mm:ss"
+                  showTime={{ defaultValue: dayjs("00:00:00", "HH:mm:ss") }}
+                  disabled
+                />
+              </Form.Item>
+
+              {error && <p style={{ color: "red" }}>{error}</p>}
+
+              <Row justify="center">
+                <Space size={"large"}>
+                  <Button onClick={onClose}>Cancel</Button>
+                  <Spin
+                    indicator={
+                      <LoadingOutlined style={{ fontSize: 24 }} spin />
+                    }
+                    spinning={isLoading}
+                  >
+                    <Button type="primary" htmlType="submit">
+                      Save
+                    </Button>
+                  </Spin>
+                </Space>
+              </Row>
+            </Form>
+          </Col>
+        </Row>
       </Modal>
     </>
   );

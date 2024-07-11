@@ -2,6 +2,7 @@
 import { Badge, Button, Dropdown, MenuProps, Modal, Space, Tag } from "antd";
 import { ColumnsType, TableProps } from "antd/es/table";
 // import { AccountModel } from './models';
+import { Image } from "antd";
 
 import {
   EllipsisOutlined,
@@ -13,6 +14,17 @@ import { PetModel } from "@/app/(homepage)/user/pets/_components/type";
 
 export const petColumn: ColumnsType<PetModel> = [
   {
+    title: "",
+    dataIndex: "Image",
+    render: (_, record) => {
+      return (
+        <>
+          <Image src={record.imageUrl} alt={"pet"} width={50} height={50} />
+        </>
+      );
+    },
+  },
+  {
     title: "Pet Name",
     dataIndex: "name",
   },
@@ -23,25 +35,6 @@ export const petColumn: ColumnsType<PetModel> = [
   {
     title: "Gender",
     dataIndex: "gender",
-  },
-  {
-    title: "Deleted",
-    dataIndex: "delete",
-    render: (text, record) => {
-      return (
-        <>
-          {record.deleted ? (
-            <>
-              <Tag color="success">TRUE</Tag>
-            </>
-          ) : (
-            <>
-              <Tag color="error">FALSE</Tag>
-            </>
-          )}
-        </>
-      );
-    },
   },
   {
     title: "",

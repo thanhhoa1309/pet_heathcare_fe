@@ -105,8 +105,10 @@ export default function UpdateDoctor(props: userModal) {
       if (res.data.status === 200 || res.data.status === 201) {
         form.setFieldsValue({
           ...res.data.data,
-          start_time: dayjs(res.data.data.start_time, "HH:mm:ss"),
-          end_time: dayjs(res.data.data.end_time, "HH:mm:ss"),
+          dateTime: [
+            dayjs(res.data.data.startTime, "HH:mm:ss"),
+            dayjs(res.data.data.endTime, "HH:mm:ss"),
+          ],
         });
         let tempRes = res.data.data;
       }
@@ -120,20 +122,22 @@ export default function UpdateDoctor(props: userModal) {
     if (isOpen) {
       setError("");
       setErrorImage("");
+      setFileList([]);
       form.resetFields();
       fetchData();
     }
   }, [isOpen]);
 
   const onFinish = async (values: any) => {
+    setIsLoading(true);
     setError("");
     let doctor: DoctorModel = {
       ...values,
-      start_time: dayjs(values.start_time).format("HH:mm:ss").toString(),
-      end_time: dayjs(values.end_time).format("HH:mm:ss").toString(),
+      // start_time: dayjs(values.dateTime[0]).format("HH:mm:ss").toString(),
+      // end_time: dayjs(values.dateTime[1]).format("HH:mm:ss").toString(),
     };
 
-    console.log(doctor);
+    // console.log(values);
 
     try {
       const res = await useInstance.put(
@@ -143,14 +147,15 @@ export default function UpdateDoctor(props: userModal) {
 
       if (res.data.status === 200 || res.data.status === 201) {
         openNotification("success", "successfully");
+        await handleSave();
         onReload();
-        onClose();
       } else {
         setError(
           Object.entries(res.data.error)
             .map(([key, value]) => `${key}: ${value}`)
             .join("\n")
         );
+        setIsLoading(false);
         openNotification(
           "error",
           `failure (${Object.values(res.data.error).join(", ")})`
@@ -160,6 +165,7 @@ export default function UpdateDoctor(props: userModal) {
       openNotification("error", `failure (${error})`);
       setError(error);
       console.log(error);
+      setIsLoading(false);
     }
   };
 
@@ -169,8 +175,9 @@ export default function UpdateDoctor(props: userModal) {
     setErrorImage("");
     setIsLoading(true);
     if (fileList.length === 0) {
-      setErrorImage("Please select a image");
       setIsLoading(false);
+      onReload();
+      onClose();
       return;
     }
 
@@ -195,14 +202,13 @@ export default function UpdateDoctor(props: userModal) {
         openNotification("success", "successfully");
         onReload();
         onClose();
-        setFileList([]);
       } catch (error: any) {
         openNotification("error", `failure (${error})`);
         setError(error);
         console.log(error);
+        setIsLoading(false);
       }
     };
-    setIsLoading(false);
   };
 
   return (
@@ -236,13 +242,14 @@ export default function UpdateDoctor(props: userModal) {
                       </Button>
                     </Upload>
                   </Form.Item>
-                  {errorImage && <p style={{ color: "red" }}>{errorImage}</p>}
-                  <Button type="primary" onClick={handleSave}>
+                  {/* {errorImage && <p style={{ color: "red" }}>{errorImage}</p>} */}
+                  {/* <Button type="primary" onClick={handleSave}>
                     Save
-                  </Button>
+                  </Button> */}
                 </Form>
               </div>
             </Col>
+
             <Col style={{ width: "70%" }}>
               <Form
                 // {...layout}
@@ -266,37 +273,25 @@ export default function UpdateDoctor(props: userModal) {
                   <Input placeholder="Enter Specialty" />
                 </Form.Item>
 
-                <Row gutter={16}>
-                  <Col style={{ width: "50%" }}>
+                {/* <Row gutter={16}>
+                  <Col style={{ width: "100%" }}>
                     <Form.Item
-                      label="Start time"
-                      name="start_time"
+                      label="Working time"
+                      name="dateTime"
                       rules={[
                         {
                           required: true,
-                          message: "Select start time",
+                          message: "Select working time",
                         },
                       ]}
                     >
-                      <TimePicker style={{ width: "100%" }} />
+                      <TimePicker.RangePicker
+                        style={{ width: "100%" }}
+                        // needConfirm={false}
+                      />
                     </Form.Item>
                   </Col>
-
-                  <Col style={{ width: "50%" }}>
-                    <Form.Item
-                      label="End day"
-                      name="end_time"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Select end time",
-                        },
-                      ]}
-                    >
-                      <TimePicker style={{ width: "100%" }} />
-                    </Form.Item>
-                  </Col>
-                </Row>
+                </Row> */}
 
                 <Form.Item
                   label="Working Day"

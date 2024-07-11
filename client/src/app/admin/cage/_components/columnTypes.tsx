@@ -55,74 +55,115 @@ export const cageColumn: ColumnsType<CageModel> = [
       const renderItems = (
         id: string,
         onRemove: () => void,
+        onUnRemove: () => void,
         onUpdate: () => void
       ): MenuProps["items"] => {
-        return [
-          {
-            label: (
-              <a
-                onClick={() => {
-                  onUpdate?.();
-                }}
-              >
-                <Space>
-                  <EditOutlined /> Update
-                </Space>
-              </a>
-            ),
-            key: "0",
-          },
-          // {
-          //   label: (
-          //     <a
-          //       onClick={() => {
-          //         onDisable?.();
-          //       }}
-          //     >
-          //       <Space>
-          //         <MdDisabledByDefault /> Disable
-          //       </Space>
-          //     </a>
-          //   ),
-          //   key: '1'
-          // },
-          {
-            type: "divider",
-          },
-          {
-            label: (
-              <a
-                onClick={() => {
-                  Modal.confirm({
-                    title: "Do you really want to delete this cage?",
-                    centered: true,
-                    width: "500px",
-                    onOk: () => {
-                      onRemove?.();
-                    },
-                    footer: (_, { OkBtn, CancelBtn }) => (
-                      <>
-                        <CancelBtn />
-                        <OkBtn />
-                      </>
-                    ),
-                  });
-                }}
-              >
-                <Space>
-                  <DeleteOutlined /> Delete
-                </Space>
-              </a>
-            ),
-            key: "2",
-          },
-        ];
+        if (!record.deleted) {
+          return [
+            {
+              label: (
+                <a
+                  onClick={() => {
+                    onUpdate?.();
+                  }}
+                >
+                  <Space>
+                    <EditOutlined /> Update
+                  </Space>
+                </a>
+              ),
+              key: "0",
+            },
+            {
+              type: "divider",
+            },
+            {
+              label: (
+                <a
+                  onClick={() => {
+                    Modal.confirm({
+                      title: "Do you really want to delete this cage?",
+                      centered: true,
+                      width: "500px",
+                      onOk: () => {
+                        onRemove?.();
+                      },
+                      footer: (_, { OkBtn, CancelBtn }) => (
+                        <>
+                          <CancelBtn />
+                          <OkBtn />
+                        </>
+                      ),
+                    });
+                  }}
+                >
+                  <Space>
+                    <DeleteOutlined /> Delete
+                  </Space>
+                </a>
+              ),
+              key: "2",
+            },
+          ];
+        } else {
+          return [
+            {
+              label: (
+                <a
+                  onClick={() => {
+                    onUpdate?.();
+                  }}
+                >
+                  <Space>
+                    <EditOutlined /> Update
+                  </Space>
+                </a>
+              ),
+              key: "0",
+            },
+            {
+              type: "divider",
+            },
+            {
+              label: (
+                <a
+                  onClick={() => {
+                    Modal.confirm({
+                      title: "Do you really want to Undelete this cage?",
+                      centered: true,
+                      width: "500px",
+                      onOk: () => {
+                        onUnRemove?.();
+                      },
+                      footer: (_, { OkBtn, CancelBtn }) => (
+                        <>
+                          <CancelBtn />
+                          <OkBtn />
+                        </>
+                      ),
+                    });
+                  }}
+                >
+                  <Space>
+                    <DeleteOutlined /> UnDelete
+                  </Space>
+                </a>
+              ),
+              key: "2",
+            },
+          ];
+        }
       };
       return (
         <>
           <Dropdown
             menu={{
-              items: renderItems(record.id, record.onRemove!, record.onUpdate!),
+              items: renderItems(
+                record.id,
+                record.onRemove!,
+                record.onUnRemove!,
+                record.onUpdate!
+              ),
             }}
           >
             <a onClick={(e) => e.preventDefault()}>

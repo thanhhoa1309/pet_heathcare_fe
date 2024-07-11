@@ -1,5 +1,4 @@
 "use client";
-import { PetModel } from "@/app/(homepage)/user/pets/_components/type";
 import UseAxiosAuth from "@/utils/axiosClient";
 import {
   EyeInvisibleOutlined,
@@ -13,6 +12,8 @@ import {
   Input,
   Modal,
   NotificationArgsProps,
+  Rate,
+  Result,
   Row,
   Select,
   Space,
@@ -22,90 +23,83 @@ import {
 import { useForm } from "antd/es/form/Form";
 import { NotificationPlacement } from "antd/es/notification/interface";
 import dayjs from "dayjs";
+import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { useMemo, useState } from "react";
+import { IoIosMailOpen } from "react-icons/io";
+import styles from "@/app/auth/_components/VerifyModal.module.scss";
+import { MdOutlinePayment } from "react-icons/md";
 
-interface petModal {
+interface AppointmentModal {
   isOpen: boolean;
   onClose: () => void;
   onReload: () => void;
   id: string;
 }
 
-export default function UpdatePet(props: petModal) {
-  const instance = UseAxiosAuth();
+const { TextArea } = Input;
+
+export default function FeedbackAppointment(props: AppointmentModal) {
   const { isOpen, onClose, onReload, id } = props;
+  const instance = UseAxiosAuth();
 
-  const [pet, setPet] = useState<PetModel>();
-
+  const router = useRouter();
   const [error, setError] = useState<string>("");
-
-  const useInstance = UseAxiosAuth();
   const [form] = useForm();
   const [api, contextHolder] = notification.useNotification();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const [openModalPayment, setOpenModalPayment] = useState<boolean>(false);
+  const [paymentUrl, setPaymentUrl] = useState<string>("");
+
   const openNotification = (type: "success" | "error", description: string) => {
     api[type]({
-      message: `Update Pet`,
-      description: `Update Pet ${description}`,
+      message: `Feedback Appointment`,
+      description: `Feedback Appointment ${description}`,
       placement: "bottomRight",
       duration: 1.5,
     });
   };
 
-  const fetchData = async () => {
-    setIsLoading(true);
+  const disableDay = (current: any) => {
+    return current && current.valueOf() < Date.now();
+  };
+
+  const fetchDataFeedback = async () => {
     try {
-      const res = await instance.get(`/api/v1/pet/${id}`);
-      if (res.data.status === 200 || res.data.status === 201) {
-        form.setFieldsValue({
-          ...res.data.data,
-          birthDate: dayjs(res.data.data?.birthDate),
-        });
-        let tempRes = res.data.data;
-        setPet(tempRes);
-        console.log(res);
+      const res = await instance.get(`/api/v1/review/${id}`);
+
+      const tempRes = res.data.data;
+      if (res.data.data) {
+        openNotification("error", "feedback is done");
+        onClose();
       }
     } catch (error: any) {
       console.log(error);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
     if (isOpen) {
-      setError("");
       form.resetFields();
-      fetchData();
+      fetchDataFeedback();
     }
+    setError("");
   }, [isOpen]);
 
   const onFinish = async (values: any) => {
     setError("");
-    let pet: PetModel = {
-      ...values,
-    };
-
-    console.log(pet);
 
     try {
-      const res = await useInstance.put(`/api/v1/pet/update/${id}`, pet);
+      const res = await instance.post(`/api/v1/review/create/${id}`, values);
 
       if (res.data.status === 200 || res.data.status === 201) {
         openNotification("success", "successfully");
         onReload();
         onClose();
       } else {
-        setError(
-          Object.entries(res.data.error)
-            .map(([key, value]) => `${key}: ${value}`)
-            .join("\n")
-        );
-        openNotification(
-          "error",
-          `failure (${Object.values(res.data.error).join(", ")})`
-        );
+        setError(res.data.error);
+        openNotification("error", `failure (${res.data.error})`);
       }
     } catch (error: any) {
       openNotification("error", `failure (${error})`);
@@ -118,7 +112,7 @@ export default function UpdatePet(props: petModal) {
     <>
       {contextHolder}
       <Modal
-        title={<h3 style={{ textAlign: "center" }}>Update Pet</h3>}
+        title={<h3 style={{ textAlign: "center" }}>Update Appointment</h3>}
         open={isOpen}
         width={600}
         onCancel={onClose}
@@ -135,67 +129,32 @@ export default function UpdatePet(props: petModal) {
           style={{ margin: "16px" }}
         >
           <Form.Item
-            label="Pet Name"
-            name="name"
+            label="Comment"
+            name="comment"
             rules={[
               {
                 required: true,
-                message: "Enter Pet Name",
+                message: "Enter comment",
               },
             ]}
           >
-            <Input placeholder="Enter Pet Name" />
-          </Form.Item>
-
-          <Form.Item
-            label="Species"
-            name="species"
-            rules={[
-              {
-                required: true,
-                message: "Enter Species",
-              },
-            ]}
-          >
-            <Input placeholder="Enter Species" />
-          </Form.Item>
-
-          <Form.Item
-            label="Gender"
-            name="gender"
-            rules={[
-              {
-                required: true,
-                message: "Select Gender",
-              },
-            ]}
-          >
-            <Select
-              placeholder="Select Gender"
-              options={[
-                { value: "MALE", label: "Male" },
-                { value: "FEMALE", label: "Female" },
-              ]}
-            ></Select>
-          </Form.Item>
-
-          <Form.Item
-            label="Birth date"
-            name="birthDate"
-            rules={[
-              {
-                required: true,
-                message: "Enter Birth date",
-              },
-            ]}
-          >
-            <DatePicker
-              placeholder="Enter Birth date"
-              style={{ width: "100%" }}
-              format="YYYY-MM-DD HH:mm:ss"
-              showTime={{ defaultValue: dayjs("00:00:00", "HH:mm:ss") }}
-              disabled
+            <TextArea
+              placeholder="Enter comment"
+              autoSize={{ minRows: 3, maxRows: 5 }}
             />
+          </Form.Item>
+
+          <Form.Item
+            label="Rating"
+            name="rating"
+            rules={[
+              {
+                required: true,
+                message: "Select Rating",
+              },
+            ]}
+          >
+            <Rate></Rate>
           </Form.Item>
 
           {error && <p style={{ color: "red" }}>{error}</p>}

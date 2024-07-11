@@ -7,5 +7,6 @@ export type CageModel = {
   updatedAt: string;
   deleted: boolean;
   onRemove: () => void;
+  onUnRemove: () => void;
   onUpdate: () => void;
 };

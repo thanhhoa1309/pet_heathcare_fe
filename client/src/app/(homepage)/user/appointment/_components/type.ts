@@ -20,7 +20,7 @@ export type AppointmentModel = {
   appointmentDate: string;
   petName: string;
   doctorName: string;
-  appointmentStatus: "PENDING";
+  appointmentStatus: "PENDING" | "BOOKED" | "CANCELLED";
   appointmentPrice: number;
   refund_payments: number;
   paidStatus: boolean;
@@ -28,8 +28,14 @@ export type AppointmentModel = {
   deleted: false;
   createdAt: string;
   updatedAt: string;
+  timeFrame: string;
   onRemove: () => void;
   onUpdate: () => void;
+  onRepay: () => void;
+  onReview: () => void;
+  onCancel: () => void;
+  onView: () => void;
+  onViewFeedBack: () => void;
 };
 
 export type pages = {

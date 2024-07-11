@@ -59,7 +59,7 @@ export default function RegisterPage() {
       setError(error?.message);
     }
 
-    setIsLoading(false);
+    // setIsLoading(false);
   };
 
   return (
@@ -214,7 +214,7 @@ export default function RegisterPage() {
             </Form.Item>
 
             <div>
-              {error && <p style={{ color: "black" }}>{error}</p>}
+              {error && <p style={{ color: "white" }}>{error}</p>}
               <Spin
                 indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
                 spinning={isLoading}

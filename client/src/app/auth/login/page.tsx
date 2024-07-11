@@ -57,7 +57,7 @@ export default function LoginPage() {
       setError(error?.message);
     }
 
-    setIsLoading(false);
+    // setIsLoading(false);
   };
 
   useEffect(() => {
@@ -156,7 +156,7 @@ export default function LoginPage() {
             </Form.Item>
 
             <div>
-              {error && <p style={{ color: "red" }}>{error}</p>}
+              {error && <p style={{ color: "white" }}>{error}</p>}
               <Spin
                 indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
                 spinning={isLoading}
