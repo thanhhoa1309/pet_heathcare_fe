@@ -12,6 +12,16 @@ const nextConfig = {
         destination: "/",
         permanent: true,
       },
+      {
+        source: "/staff",
+        destination: "/staff/appointment",
+        permanent: true,
+      },
+      {
+        source: "/doctor",
+        destination: "/doctor/appointment",
+        permanent: true,
+      },
     ];
   },
   images: {
@@ -23,6 +33,9 @@ const nextConfig = {
         pathname: "/**",
       },
     ],
+  },
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
   },
 };
 

@@ -16,5 +16,6 @@ export type DoctorModel = {
     | "SUNDAY"
   ];
   onRemove: () => void;
+  onUnRemove: () => void;
   onUpdate: () => void;
 };

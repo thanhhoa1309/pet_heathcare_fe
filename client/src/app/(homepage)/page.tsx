@@ -1,6 +1,9 @@
 "use client";
 import Image from "next/image";
 import * as image from "@/assets/images/images";
+import ServiceHome from "@/app/(homepage)/_components/serviceHome";
+import FeedBackHome from "@/app/(homepage)/_components/feedback";
+import "@/styles/homepage.scss";
 
 export default function Home() {
   return (
@@ -305,102 +308,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="container-fluid bg-light pt-5">
-          <div className="container py-5">
-            <div className="d-flex flex-column text-center mb-5">
-              <h4 className="text-secondary mb-3">Our Services</h4>
-              <h1 className="display-4 m-0">
-                <span className="text-primary">Premium</span> Pet Services
-              </h1>
-            </div>
-            <div className="row pb-3">
-              <div className="col-md-6 col-lg-4 mb-4">
-                <div className="d-flex flex-column text-center bg-white mb-2 p-3 p-sm-5">
-                  <h3 className="flaticon-house display-3 font-weight-normal text-secondary mb-3"></h3>
-                  <h3 className="mb-3">Pet Boarding</h3>
-                  <p>
-                    Diam amet eos at no eos sit lorem, amet rebum ipsum clita
-                    stet, diam sea est magna diam eos, rebum sit vero stet ipsum
-                    justo
-                  </p>
-                  <a className="text-uppercase font-weight-bold" href="">
-                    Read More
-                  </a>
-                </div>
-              </div>
-              <div className="col-md-6 col-lg-4 mb-4">
-                <div className="d-flex flex-column text-center bg-white mb-2 p-3 p-sm-5">
-                  <h3 className="flaticon-food display-3 font-weight-normal text-secondary mb-3"></h3>
-                  <h3 className="mb-3">Pet Feeding</h3>
-                  <p>
-                    Diam amet eos at no eos sit lorem, amet rebum ipsum clita
-                    stet, diam sea est magna diam eos, rebum sit vero stet ipsum
-                    justo
-                  </p>
-                  <a className="text-uppercase font-weight-bold" href="">
-                    Read More
-                  </a>
-                </div>
-              </div>
-              <div className="col-md-6 col-lg-4 mb-4">
-                <div className="d-flex flex-column text-center bg-white mb-2 p-3 p-sm-5">
-                  <h3 className="flaticon-grooming display-3 font-weight-normal text-secondary mb-3"></h3>
-                  <h3 className="mb-3">Pet Grooming</h3>
-                  <p>
-                    Diam amet eos at no eos sit lorem, amet rebum ipsum clita
-                    stet, diam sea est magna diam eos, rebum sit vero stet ipsum
-                    justo
-                  </p>
-                  <a className="text-uppercase font-weight-bold" href="">
-                    Read More
-                  </a>
-                </div>
-              </div>
-              <div className="col-md-6 col-lg-4 mb-4">
-                <div className="d-flex flex-column text-center bg-white mb-2 p-3 p-sm-5">
-                  <h3 className="flaticon-cat display-3 font-weight-normal text-secondary mb-3"></h3>
-                  <h3 className="mb-3">Per Training</h3>
-                  <p>
-                    Diam amet eos at no eos sit lorem, amet rebum ipsum clita
-                    stet, diam sea est magna diam eos, rebum sit vero stet ipsum
-                    justo
-                  </p>
-                  <a className="text-uppercase font-weight-bold" href="">
-                    Read More
-                  </a>
-                </div>
-              </div>
-              <div className="col-md-6 col-lg-4 mb-4">
-                <div className="d-flex flex-column text-center bg-white mb-2 p-3 p-sm-5">
-                  <h3 className="flaticon-dog display-3 font-weight-normal text-secondary mb-3"></h3>
-                  <h3 className="mb-3">Pet Exercise</h3>
-                  <p>
-                    Diam amet eos at no eos sit lorem, amet rebum ipsum clita
-                    stet, diam sea est magna diam eos, rebum sit vero stet ipsum
-                    justo
-                  </p>
-                  <a className="text-uppercase font-weight-bold" href="">
-                    Read More
-                  </a>
-                </div>
-              </div>
-              <div className="col-md-6 col-lg-4 mb-4">
-                <div className="d-flex flex-column text-center bg-white mb-2 p-3 p-sm-5">
-                  <h3 className="flaticon-vaccine display-3 font-weight-normal text-secondary mb-3"></h3>
-                  <h3 className="mb-3">Pet Treatment</h3>
-                  <p>
-                    Diam amet eos at no eos sit lorem, amet rebum ipsum clita
-                    stet, diam sea est magna diam eos, rebum sit vero stet ipsum
-                    justo
-                  </p>
-                  <a className="text-uppercase font-weight-bold" href="">
-                    Read More
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ServiceHome></ServiceHome>
 
         <div className="container">
           <div className="row align-items-center">
@@ -821,90 +729,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="container-fluid bg-light mt-5 p-0 py-5">
-          <div className="container p-0 py-5">
-            <div className="d-flex flex-column text-center mb-5">
-              <h4 className="text-secondary mb-3">Testimonial</h4>
-              <h1 className="display-4 m-0">
-                Our Client <span className="text-primary">Says</span>
-              </h1>
-            </div>
-            <div className="owl-carousel testimonial-carousel">
-              <div className="bg-white mx-3 p-4">
-                <div className="d-flex align-items-end mb-3 mt-n4 ml-n4">
-                  <Image
-                    className="img-fluid"
-                    src={image.testimonial1}
-                    style={{ width: "80px", height: "80px" }}
-                    alt=""
-                  />
-                  <div className="ml-3">
-                    <h5>Client Name</h5>
-                    <i>Profession</i>
-                  </div>
-                </div>
-                <p className="m-0">
-                  Sed ea amet kasd elitr stet, stet rebum et ipsum est duo elitr
-                  eirmod clita lorem. Dolor tempor ipsum sanct clita
-                </p>
-              </div>
-              <div className="bg-white mx-3 p-4">
-                <div className="d-flex align-items-end mb-3 mt-n4 ml-n4">
-                  <Image
-                    className="img-fluid"
-                    src={image.testimonial2}
-                    style={{ width: "80px", height: "80px" }}
-                    alt=""
-                  />
-                  <div className="ml-3">
-                    <h5>Client Name</h5>
-                    <i>Profession</i>
-                  </div>
-                </div>
-                <p className="m-0">
-                  Sed ea amet kasd elitr stet, stet rebum et ipsum est duo elitr
-                  eirmod clita lorem. Dolor tempor ipsum sanct clita
-                </p>
-              </div>
-              <div className="bg-white mx-3 p-4">
-                <div className="d-flex align-items-end mb-3 mt-n4 ml-n4">
-                  <Image
-                    className="img-fluid"
-                    src={image.testimonial3}
-                    style={{ width: "80px", height: "80px" }}
-                    alt=""
-                  />
-                  <div className="ml-3">
-                    <h5>Client Name</h5>
-                    <i>Profession</i>
-                  </div>
-                </div>
-                <p className="m-0">
-                  Sed ea amet kasd elitr stet, stet rebum et ipsum est duo elitr
-                  eirmod clita lorem. Dolor tempor ipsum sanct clita
-                </p>
-              </div>
-              <div className="bg-white mx-3 p-4">
-                <div className="d-flex align-items-end mb-3 mt-n4 ml-n4">
-                  <Image
-                    className="img-fluid"
-                    src={image.testimonial4}
-                    style={{ width: "80px", height: "80px" }}
-                    alt=""
-                  />
-                  <div className="ml-3">
-                    <h5>Client Name</h5>
-                    <i>Profession</i>
-                  </div>
-                </div>
-                <p className="m-0">
-                  Sed ea amet kasd elitr stet, stet rebum et ipsum est duo elitr
-                  eirmod clita lorem. Dolor tempor ipsum sanct clita
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <FeedBackHome></FeedBackHome>
       </section>
     </>
   );

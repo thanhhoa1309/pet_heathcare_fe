@@ -80,13 +80,30 @@ export default function AdminAccount() {
     try {
       const res = await instance.patch(`/api/v1/service/delete/${id}`);
       if (res.data.status === 200 || res.data.status === 201) {
-        openNotification("success", "deleted successfully");
+        openNotification("success", "delete successfully");
         handleEvent();
       } else {
-        openNotification("error", "deleted failure");
+        openNotification("error", "delete failure");
       }
     } catch (error) {
-      openNotification("error", "deleted failure");
+      openNotification("error", "delete failure");
+      console.log(error);
+    }
+    setIsLoading(false);
+  };
+
+  const handleUnDelete = async (id: string) => {
+    setIsLoading(true);
+    try {
+      const res = await instance.patch(`/api/v1/service/undelete/${id}`);
+      if (res.data.status === 200 || res.data.status === 201) {
+        openNotification("success", "Undelete successfully");
+        handleEvent();
+      } else {
+        openNotification("error", "Undelete failure");
+      }
+    } catch (error) {
+      openNotification("error", "delete failure");
       console.log(error);
     }
     setIsLoading(false);
@@ -244,6 +261,7 @@ export default function AdminAccount() {
             ...service,
             onUpdate: () => handleUpdate(service.id),
             onRemove: () => handleDelete(service.id),
+            onUnRemove: () => handleUnDelete(service.id),
           }))}
         />
         <UpdateService

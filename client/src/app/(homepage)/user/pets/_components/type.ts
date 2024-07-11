@@ -7,6 +7,7 @@ export type PetModel = {
   deleted: false;
   createdAt: string;
   updatedAt: string;
+  imageUrl?: string;
   onRemove: () => void;
   onUpdate: () => void;
 };

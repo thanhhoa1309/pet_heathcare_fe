@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { BsHospital } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
 import { MdOutlinePets } from "react-icons/md";
+import { PiHospital, PiHospitalLight } from "react-icons/pi";
 import { VscSignOut } from "react-icons/vsc";
 
 export default function Header() {
@@ -69,6 +70,18 @@ export default function Header() {
     {
       key: "4",
       label: (
+        <div
+          style={{ padding: "10px 20px" }}
+          onClick={() => router.push("/user/hospitalized")}
+        >
+          Hospitalized
+        </div>
+      ),
+      icon: <PiHospital style={{ fontSize: "24px" }} />,
+    },
+    {
+      key: "5",
+      label: (
         <div style={{ padding: "10px 20px" }} onClick={() => signOut()}>
           <span>Sign out</span>
         </div>
@@ -89,7 +102,7 @@ export default function Header() {
             </a>
           </div>
           <div className="col-lg-8 text-center text-lg-right">
-            <div className="d-inline-flex align-items-center">
+            {/* <div className="d-inline-flex align-items-center">
               <div className="d-inline-flex flex-column text-center pr-3 border-right">
                 <h6>Opening Hours</h6>
                 <p className="m-0">8.00AM - 9.00PM</p>
@@ -102,7 +115,7 @@ export default function Header() {
                 <h6>Call Us</h6>
                 <p className="m-0">+012 345 6789</p>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

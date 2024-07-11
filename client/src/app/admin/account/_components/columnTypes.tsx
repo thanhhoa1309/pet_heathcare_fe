@@ -52,86 +52,155 @@ export const userColumn: ColumnsType<UserModel> = [
       const renderItems = (
         id: string,
         onRemove: () => void,
-        onUpdate: () => void
+        onUpdate: () => void,
+        onUnRemove: () => void
       ): MenuProps["items"] => {
-        return [
-          {
-            label: (
-              <a
-                onClick={() => {
-                  onUpdate?.();
-                }}
-              >
-                <Space>
-                  <EditOutlined /> Update
-                </Space>
-              </a>
-            ),
-            key: "0",
-          },
-          // {
-          //   label: (
-          //     <a
-          //       onClick={() => {
-          //         onDisable?.();
-          //       }}
-          //     >
-          //       <Space>
-          //         <MdDisabledByDefault /> Disable
-          //       </Space>
-          //     </a>
-          //   ),
-          //   key: '1'
-          // },
-          {
-            type: "divider",
-          },
-          {
-            label: (
-              <a
-                onClick={() => {
-                  {
-                    !record.deleted
-                      ? Modal.confirm({
-                          title: "Do you really want to delete this account?",
-                          centered: true,
-                          width: "500px",
-                          onOk: () => {
-                            onRemove?.();
-                          },
-                          footer: (_, { OkBtn, CancelBtn }) => (
-                            <>
-                              <CancelBtn />
-                              <OkBtn />
-                            </>
-                          ),
-                        })
-                      : Modal.info({
-                          title: "Account deleted",
-                          content: (
-                            <div>
-                              <p>This account is deleted</p>
-                            </div>
-                          ),
-                          onOk() {},
-                        });
-                  }
-                }}
-              >
-                <Space>
-                  <DeleteOutlined /> Delete
-                </Space>
-              </a>
-            ),
-            key: "2",
-          },
-        ];
+        if (!record.deleted) {
+          return [
+            {
+              label: (
+                <a
+                  onClick={() => {
+                    onUpdate?.();
+                  }}
+                >
+                  <Space>
+                    <EditOutlined /> Update
+                  </Space>
+                </a>
+              ),
+              key: "0",
+            },
+            // {
+            //   label: (
+            //     <a
+            //       onClick={() => {
+            //         onDisable?.();
+            //       }}
+            //     >
+            //       <Space>
+            //         <MdDisabledByDefault /> Disable
+            //       </Space>
+            //     </a>
+            //   ),
+            //   key: '1'
+            // },
+            {
+              type: "divider",
+            },
+            {
+              label: (
+                <a
+                  onClick={() => {
+                    {
+                      !record.deleted
+                        ? Modal.confirm({
+                            title: "Do you really want to delete this account?",
+                            centered: true,
+                            width: "500px",
+                            onOk: () => {
+                              onRemove?.();
+                            },
+                            footer: (_, { OkBtn, CancelBtn }) => (
+                              <>
+                                <CancelBtn />
+                                <OkBtn />
+                              </>
+                            ),
+                          })
+                        : Modal.info({
+                            title: "Account deleted",
+                            content: (
+                              <div>
+                                <p>This account is deleted</p>
+                              </div>
+                            ),
+                            onOk() {},
+                          });
+                    }
+                  }}
+                >
+                  <Space>
+                    <DeleteOutlined /> Delete
+                  </Space>
+                </a>
+              ),
+              key: "2",
+            },
+          ];
+        } else {
+          return [
+            {
+              label: (
+                <a
+                  onClick={() => {
+                    onUpdate?.();
+                  }}
+                >
+                  <Space>
+                    <EditOutlined /> Update
+                  </Space>
+                </a>
+              ),
+              key: "0",
+            },
+            {
+              type: "divider",
+            },
+            {
+              label: (
+                <a
+                  onClick={() => {
+                    {
+                      record.deleted
+                        ? Modal.confirm({
+                            title:
+                              "Do you really want to undelete this account?",
+                            centered: true,
+                            width: "500px",
+                            onOk: () => {
+                              onUnRemove?.();
+                            },
+                            footer: (_, { OkBtn, CancelBtn }) => (
+                              <>
+                                <CancelBtn />
+                                <OkBtn />
+                              </>
+                            ),
+                          })
+                        : Modal.info({
+                            title: "Account deleted",
+                            content: (
+                              <div>
+                                <p>This account is deleted</p>
+                              </div>
+                            ),
+                            onOk() {},
+                          });
+                    }
+                  }}
+                >
+                  <Space>
+                    <DeleteOutlined /> UnDelete
+                  </Space>
+                </a>
+              ),
+              key: "2",
+            },
+          ];
+        }
       };
+
       return (
         <>
           <Dropdown
             menu={{
-              items: renderItems(record.id, record.onRemove!, record.onUpdate!),
+              items: renderItems(
+                record.id,
+                record.onRemove!,
+                record.onUpdate!,
+                record.onUnRemove!
+              ),
             }}
           >
             <a onClick={(e) => e.preventDefault()}>

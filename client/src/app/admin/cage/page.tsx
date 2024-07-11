@@ -81,13 +81,30 @@ export default function Cage() {
     try {
       const res = await instance.patch(`/api/v1/cage/delete/${id}`);
       if (res.data.status === 200 || res.data.status === 201) {
-        openNotification("success", "deleted successfully");
+        openNotification("success", "delete successfully");
         handleEvent();
       } else {
-        openNotification("error", "deleted failure");
+        openNotification("error", "delete failure");
       }
     } catch (error) {
-      openNotification("error", "deleted failure");
+      openNotification("error", "delete failure");
+      console.log(error);
+    }
+    setIsLoading(false);
+  };
+
+  const handleUnDelete = async (id: string) => {
+    setIsLoading(true);
+    try {
+      const res = await instance.patch(`/api/v1/cage/undelete/${id}`);
+      if (res.data.status === 200 || res.data.status === 201) {
+        openNotification("success", "Undelete successfully");
+        handleEvent();
+      } else {
+        openNotification("error", "Undelete failure");
+      }
+    } catch (error) {
+      openNotification("error", "Undeleted failure");
       console.log(error);
     }
     setIsLoading(false);
@@ -216,6 +233,7 @@ export default function Cage() {
             ...cage,
             onUpdate: () => handleUpdate(cage.id),
             onRemove: () => handleDelete(cage.id),
+            onUnRemove: () => handleUnDelete(cage.id),
           }))}
         />
         <UpdateCage

@@ -209,7 +209,7 @@ export default function AdminAccount() {
                   ?.classList.contains("ant-table-cell-fix-right");
 
               if (isWithinAction && !isWithinLink) {
-                handleUpdate(record.id);
+                // handleUpdate(record.id);
               }
             },
           })}

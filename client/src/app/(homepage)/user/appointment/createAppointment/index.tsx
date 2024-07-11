@@ -17,6 +17,7 @@ import {
   Select,
   Space,
   Spin,
+  Tooltip,
   notification,
 } from "antd";
 import { useForm } from "antd/es/form/Form";
@@ -27,6 +28,8 @@ import React, { useEffect } from "react";
 import { useMemo, useState } from "react";
 import { IoIosMailOpen } from "react-icons/io";
 import styles from "@/app/auth/_components/VerifyModal.module.scss";
+import { MdOutlinePayment } from "react-icons/md";
+import ModalPayment from "@/app/(homepage)/user/appointment/_components/ModalPayment";
 
 interface AppointmentModal {
   isOpen: boolean;
@@ -39,6 +42,7 @@ interface CreateAppointment {
   petId: string;
   doctorId: string;
   serviceId: string;
+  timeFrame: string;
 }
 
 interface PetModel {
@@ -94,6 +98,8 @@ export default function CreateAppointment(props: AppointmentModal) {
   const [petsOptions, setPetsOptions] = useState<optionModel[]>([]);
   const [services, setServices] = useState<ServiceModel[]>([]);
   const [serviceOptions, setServiceOptions] = useState<optionModel[]>([]);
+
+  const [isChooseDoctor, setIsChooseDoctor] = useState<boolean>(false);
   const [doctors, setDoctors] = useState<DoctorModel[]>();
   const [doctorOptions, setDoctorOptions] = useState<optionModel[]>([]);
 
@@ -123,14 +129,27 @@ export default function CreateAppointment(props: AppointmentModal) {
     }
   };
 
+  const disableDay = (current: any) => {
+    return current && current.valueOf() < Date.now();
+  };
+
   const fetchDataServices = async () => {
     try {
-      const res = await instance.get("/api/v1/service");
+      const res = await instance.get("/api/v1/service/types", {
+        params: {
+          type: "APPOINTMENT",
+        },
+      });
 
       let tempRes = res.data.data;
       const options = tempRes.map((service: any) => ({
         value: service.id,
-        label: service.name,
+        label: (
+          <div className="d-flex justify-content-between">
+            <span>{service.name}</span>
+            <span>Price: {service.price}</span>
+          </div>
+        ),
       }));
 
       console.log(
@@ -147,9 +166,14 @@ export default function CreateAppointment(props: AppointmentModal) {
     }
   };
 
-  const fetchDataDoctors = async () => {
+  const fetchDataDoctors = async (day: string, _timeFrame: string) => {
     try {
-      const res = await instance.get("/api/v1/doctor");
+      const res = await instance.get("/api/v1/doctor/availability", {
+        params: {
+          date: day,
+          timeFrame: _timeFrame,
+        },
+      });
 
       let tempRes = res.data.data;
       const options = tempRes.map((doctor: any) => ({
@@ -165,21 +189,25 @@ export default function CreateAppointment(props: AppointmentModal) {
   };
 
   useEffect(() => {
-    if (isOpen) form.resetFields();
-
+    if (isOpen) {
+      setIsChooseDoctor(false);
+      form.resetFields();
+    }
+    setError("");
     fetchDataPets();
-    fetchDataDoctors();
     fetchDataServices();
   }, [isOpen]);
 
   const onFinish = async (values: any) => {
     setError("");
+    setIsLoading(true);
 
     let appointment: CreateAppointment = {
       appointmentDate: dayjs(values?.appointmentDate).format("YYYY-MM-DD"),
       petId: values.petId,
       doctorId: values.doctorId,
       serviceId: values.serviceId,
+      timeFrame: values.timeFrame,
     };
 
     console.log(appointment);
@@ -194,14 +222,14 @@ export default function CreateAppointment(props: AppointmentModal) {
         setOpenModalPayment(true);
         setPaymentUrl(res.data.data.paymentUrl);
       } else {
-        setError(Object.values(res.data.error).toString());
-        openNotification("error", `failure (${Object.values(res.data.error)})`);
+        setError(res.data.error);
+        openNotification("error", `failure (${res.data.error})`);
       }
     } catch (error: any) {
       openNotification("error", `failure (${error})`);
-      setError(error);
-      console.log(error);
+      setError(error.error);
     }
+    setIsLoading(false);
   };
 
   const handleCancelPayment = () => {
@@ -211,7 +239,27 @@ export default function CreateAppointment(props: AppointmentModal) {
   };
 
   const handleConfirmPayment = () => {
-    router.push(paymentUrl);
+    window.open(paymentUrl, "_blank", "noopener,noreferrer");
+    // router.push(paymentUrl);
+    setOpenModalPayment(false);
+    onReload();
+    onClose();
+  };
+
+  const handleChangeDatePicker = async () => {
+    form.setFieldsValue({ doctorId: undefined });
+    if (
+      form.getFieldValue("timeFrame") &&
+      form.getFieldValue("appointmentDate")
+    ) {
+      fetchDataDoctors(
+        dayjs(form.getFieldValue("appointmentDate"))
+          .format("YYYY-MM-DD")
+          .toString(),
+        form.getFieldValue("timeFrame")
+      );
+      setIsChooseDoctor(true);
+    }
   };
 
   return (
@@ -247,6 +295,9 @@ export default function CreateAppointment(props: AppointmentModal) {
             <DatePicker
               placeholder="Enter Appointment Date"
               style={{ width: "100%" }}
+              allowClear={false}
+              disabledDate={disableDay}
+              onChange={handleChangeDatePicker}
             />
           </Form.Item>
 
@@ -264,6 +315,42 @@ export default function CreateAppointment(props: AppointmentModal) {
           </Form.Item>
 
           <Form.Item
+            label="Time Frame"
+            name="timeFrame"
+            rules={[
+              {
+                required: true,
+                message: "Select time Frame",
+              },
+            ]}
+          >
+            <Select
+              placeholder="Select time Frame"
+              options={[
+                {
+                  value: "MORNING",
+                  label: (
+                    <>
+                      <Tooltip title="9:00 AM - 12:00 AM">{"Morning"}</Tooltip>
+                    </>
+                  ),
+                },
+                {
+                  value: "AFTERNOON",
+                  label: (
+                    <>
+                      <Tooltip title="14:00 PM - 18:00 PM">
+                        {"Afternoon"}
+                      </Tooltip>
+                    </>
+                  ),
+                },
+              ]}
+              onChange={handleChangeDatePicker}
+            />
+          </Form.Item>
+
+          <Form.Item
             label="Doctor"
             name="doctorId"
             rules={[
@@ -273,7 +360,11 @@ export default function CreateAppointment(props: AppointmentModal) {
               },
             ]}
           >
-            <Select placeholder="Enter Doctor" options={doctorOptions} />
+            <Select
+              placeholder="Enter Doctor"
+              options={doctorOptions}
+              disabled={!isChooseDoctor}
+            />
           </Form.Item>
 
           <Form.Item
@@ -306,43 +397,12 @@ export default function CreateAppointment(props: AppointmentModal) {
           </Row>
         </Form>
       </Modal>
-      <Modal
-        title=""
-        open={openModalPayment}
-        width={500}
-        // onCancel={onClose}
-        footer={() => <></>}
-        cancelText="No"
-        mask={true}
-        closable={false}
-      >
-        <>
-          <Result
-            icon={
-              <span className={styles.containerOTP}>
-                <IoIosMailOpen />
-              </span>
-            }
-            title={
-              <>
-                <span style={{ fontSize: 26 }}>Payment</span>
-                <br />
-                <span style={{ fontSize: 14 }}></span>
-              </>
-            }
-            extra={
-              <>
-                <Button type="primary" onClick={() => handleCancelPayment()}>
-                  Cancel
-                </Button>
-                <Button type="primary" onClick={() => handleConfirmPayment()}>
-                  GOT IT
-                </Button>
-              </>
-            }
-          />
-        </>
-      </Modal>
+      <ModalPayment
+        isOpen={openModalPayment}
+        onClose={() => setOpenModalPayment(false)}
+        handleCancelPayment={handleCancelPayment}
+        handleConfirmPayment={handleConfirmPayment}
+      ></ModalPayment>
     </>
   );
 }
